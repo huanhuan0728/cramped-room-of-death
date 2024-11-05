@@ -5,6 +5,7 @@ import { TILE_HIGHT, TILE_WIDTH } from '../Tile/TileManager';
 import { PlayerStateMachine } from './PlayerStateMachine';
 import { EnityManager } from '../../Base/EnityManager';
 import { DataManager } from '../../Runtime/dataManager';
+import { IEntity } from '../../Levels';
 const { ccclass, property } = _decorator;
 
 
@@ -15,17 +16,11 @@ export class PlayerManager extends EnityManager {
   isMoving = false;
   private readonly speed = 1/10;
 
-  async init(){
+  async init(params:IEntity){
 
     this.fsm = this.addComponent(PlayerStateMachine);
     await this.fsm.init();
-    super.init({
-      x:2,
-      y:8,
-      type:ENTITY_TYPE_ENUM.PLAYER,
-      direction:DIRECTION_ENUM.TOP,
-      state: ENTITY_STATE_ENUM.IDLE
-    })
+    super.init(params)
 
     this.targetX = this.x;
     this.targetY = this.y;

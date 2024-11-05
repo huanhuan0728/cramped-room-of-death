@@ -1,3 +1,4 @@
+import { EnemyManager } from "../Base/EnemyManager";
 import Singleton from "../Base/singleton";
 import { ITile } from "../Levels";
 import { DoorManager } from "../Scripts/Door/DoorManager";
@@ -18,7 +19,7 @@ export class DataManager extends Singleton{
   levelIndex:number = 1;
   player:PlayerManager
   door:DoorManager
-  enemies:WoodenSkeletonManager[]
+  enemies:EnemyManager[]
 
 
   reset(){
