@@ -12,15 +12,16 @@ const { ccclass, property } = _decorator;
 
 
 
-@ccclass('WoodenSkeletonStateMachine')
+@ccclass('IronSkeletonStateMachine')
 export class IronSkeletonStateMachine extends StateMachine {
 
   async init(){
-    this.animationComponent = this.addComponent(Animation);
 
+    this.animationComponent = this.addComponent(Animation);
     this.initParams();
     this.initStateMachine();
     this.initAnimationEvent();
+
 
     await Promise.all(this.waitingList);
 
@@ -29,7 +30,7 @@ export class IronSkeletonStateMachine extends StateMachine {
   initParams(){
     this.params.set(PARAMS_NAME_ENUM.IDLE,getInitParamsTrigger());
     this.params.set(PARAMS_NAME_ENUM.DEATH, getInitParamsNumber());
-
+    this.params.set(PARAMS_NAME_ENUM.DIRECTION, getInitParamsNumber())
 
   }
 
@@ -42,8 +43,10 @@ export class IronSkeletonStateMachine extends StateMachine {
   }
 
   run(){
+    console.error('Invalid currentState or missing run method in currentState:', this.currentState);
     switch(this.currentState){
       case this.stateMachines.get(PARAMS_NAME_ENUM.IDLE):
+      case this.stateMachines.get(PARAMS_NAME_ENUM.DEATH):
         if(this.params.get(PARAMS_NAME_ENUM.IDLE).value){
           this.currentState = this.stateMachines.get(PARAMS_NAME_ENUM.IDLE)
         }else if(this.params.get(PARAMS_NAME_ENUM.DEATH).value){
@@ -57,6 +60,28 @@ export class IronSkeletonStateMachine extends StateMachine {
         this.currentState = this.stateMachines.get(PARAMS_NAME_ENUM.IDLE)
     }
   }
+
+
+  // run() {
+  //   // Retrieve the state machine objects
+  //   const idleState = this.stateMachines.get(PARAMS_NAME_ENUM.IDLE);
+  //   const deathState = this.stateMachines.get(PARAMS_NAME_ENUM.DEATH);
+
+  //   // Update current state based on parameters
+  //   if (this.params.get(PARAMS_NAME_ENUM.IDLE)?.value) {
+  //     this.currentState = idleState;
+  //   } else if (this.params.get(PARAMS_NAME_ENUM.DEATH)?.value) {
+  //     this.currentState = deathState;
+  //   }
+
+  //   // Ensure currentState is valid and has a `run` method
+  //   if (this.currentState && typeof this.currentState.run === 'function') {
+  //     this.currentState.run();
+  //   } else {
+  //     console.error('Invalid currentState or missing run method in currentState:', this.currentState);
+  //   }
+  // }
+
 }
 
 
