@@ -43,7 +43,7 @@ export class IronSkeletonStateMachine extends StateMachine {
   }
 
   run(){
-    console.error('Invalid currentState or missing run method in currentState:', this.currentState);
+    // console.error('Invalid currentState or missing run method in currentState:', this.currentState);
     switch(this.currentState){
       case this.stateMachines.get(PARAMS_NAME_ENUM.IDLE):
       case this.stateMachines.get(PARAMS_NAME_ENUM.DEATH):

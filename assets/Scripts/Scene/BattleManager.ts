@@ -44,9 +44,9 @@ export class BattleManager extends Component {
             DataManager.Instance.mapColumnCount = this.level.mapInfo[0].length   || 0;
 
             this.generateTileMap();
-            // this.generateEnemies()
+            this.generateEnemies()
             this.generatePlayer();
-            // this.generateDoor();
+            this.generateDoor();
             this.generateBursts();
 
         }
@@ -140,6 +140,7 @@ export class BattleManager extends Component {
     }
 
     async generateBursts(){
+        console.log("generateBurst")
         const burst = createUINode();
         burst.setParent(this.stage);
         const burstManager = burst.addComponent(BurstManager);
