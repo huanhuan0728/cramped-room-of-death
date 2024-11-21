@@ -40,6 +40,7 @@ export class IronSkeletonStateMachine extends StateMachine {
   }
 
   initAnimationEvent(){
+    console.log("xuhuohua")
   }
 
   run(){
