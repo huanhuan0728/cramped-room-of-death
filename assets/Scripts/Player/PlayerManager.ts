@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, Sprite, UITransform, Animation, AnimationClip, animation, Vec3, resources, SpriteFrame} from 'cc';
+import { _decorator, Component, Node, Sprite, UITransform, Animation, AnimationClip, animation, Vec3, resources, SpriteFrame, Burst} from 'cc';
 import { EventManager } from '../../Runtime/EventManager';
 import { CONTROLLER_ENUM, DIRECTION_ENUM, DIRECTION_ORDER_ENUM, ENTITY_STATE_ENUM, ENTITY_TYPE_ENUM, EVENT_ENUM, PARAMS_NAME_ENUM } from '../../Enums';
 import { TILE_HIGHT, TILE_WIDTH } from '../Tile/TileManager';
@@ -7,6 +7,7 @@ import { EnityManager } from '../../Base/EnityManager';
 import { DataManager } from '../../Runtime/dataManager';
 import { IEntity } from '../../Levels';
 import { EnemyManager } from '../../Base/EnemyManager';
+import { BurstManager } from '../Burst/BurstManager';
 const { ccclass, property } = _decorator;
 
 
@@ -107,12 +108,12 @@ export class PlayerManager extends EnityManager {
       return
     }
 
-    // const id = this.willAttack(inputDirection)
-    // if(id){
-    //   EventManager.Instance.emit(EVENT_ENUM.ATTACK_ENEMY, id)
-    //   EventManager.Instance.emit(EVENT_ENUM.DOOR_OPEN)
-    //   return;
-    // }
+    const id = this.willAttack(inputDirection)
+    if(id){
+      EventManager.Instance.emit(EVENT_ENUM.ATTACK_ENEMY, id)
+      EventManager.Instance.emit(EVENT_ENUM.DOOR_OPEN)
+      return;
+    }
 
     if(this.willBlock(inputDirection)){
       console.log("block");
@@ -151,8 +152,9 @@ export class PlayerManager extends EnityManager {
       }else if(this.direction === DIRECTION_ENUM.RIGHT){
         this.direction = DIRECTION_ENUM.TOP;
       }
-      EventManager.Instance.emit(EVENT_ENUM.PLAYER_MOVE_END);
       this.state = ENTITY_STATE_ENUM.TURNLEFT;
+      EventManager.Instance.emit(EVENT_ENUM.PLAYER_MOVE_END);
+
     }else if(inputDirection === CONTROLLER_ENUM.TURNRIGHT){
       if(this.direction === DIRECTION_ENUM.TOP){
         this.direction = DIRECTION_ENUM.RIGHT
@@ -182,6 +184,7 @@ export class PlayerManager extends EnityManager {
     // )
     const {x: doorX, y: doorY, state: doorState} = DataManager.Instance.door
     const enemies:EnemyManager[] = DataManager.Instance.enemies.filter(enemy => enemy.state !== ENTITY_STATE_ENUM.DEATH)
+    const burst:BurstManager[] = DataManager.Instance.burst.filter(burst => burst.state !== ENTITY_STATE_ENUM.DEATH)
 
 
     const { mapRowCount: row, mapColumnCount: column } = DataManager.Instance
@@ -219,6 +222,13 @@ export class PlayerManager extends EnityManager {
           if ((enemyX === x && enemyY === weaponNextY) || (enemyX === x && enemyY === playerNextY)) {
             this.state = ENTITY_STATE_ENUM.BLOCKFRONT
             return true
+          }
+        }
+
+        for(let i = 0; i < burst.length; i++){
+          const { x: burstX, y: burstY } = burst[i]
+          if((burstX === x && burstY === playerNextY) && ((!nextWeaponTile || nextWeaponTile.turnable))){
+            return false;
           }
         }
 

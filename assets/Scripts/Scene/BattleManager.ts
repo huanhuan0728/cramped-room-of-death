@@ -44,10 +44,10 @@ export class BattleManager extends Component {
             DataManager.Instance.mapColumnCount = this.level.mapInfo[0].length   || 0;
 
             this.generateTileMap();
-            this.generateEnemies()
-            this.generatePlayer();
             this.generateDoor();
             this.generateBursts();
+            this.generateEnemies();
+            this.generatePlayer();
 
         }
     }

@@ -10,6 +10,10 @@ const { ccclass, property } = _decorator;
 
 @ccclass('WoodenSkeletonManager')
 export class BurstManager extends EnityManager {
+  // static get Instance(){
+  //   return super.GetInstance<BurstManager>()
+  // }
+
 
   async init(params){
 
@@ -44,7 +48,8 @@ export class BurstManager extends EnityManager {
       this.state = ENTITY_STATE_ENUM.ATTACK
     }else if(this.state === ENTITY_STATE_ENUM.ATTACK){
       this.state = ENTITY_STATE_ENUM.DEATH
-      if(this.x === playerX && this.y === playerX){
+      if(this.x === playerX && this.y === playerY){
+        console.log('attack player');
         EventManager.Instance.emit(EVENT_ENUM.ATTACK_PLAYER, ENTITY_STATE_ENUM.AIRDEATH)
       }
     }

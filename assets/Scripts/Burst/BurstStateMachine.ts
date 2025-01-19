@@ -3,7 +3,7 @@ import { EventManager } from '../../Runtime/EventManager';
 import { CONTROLLER_ENUM, ENTITY_STATE_ENUM, EVENT_ENUM, FSM_PARAMS_TYPE_ENUM, PARAMS_NAME_ENUM } from '../../Enums';
 import State from '../../Base/State';
 import { getInitParamsNumber, getInitParamsTrigger, StateMachine } from '../../Base/StateMachine';
-const BASE_URL = 'texture/burst/'
+const BASE_URL = 'texture/burst'
 
 
 const { ccclass, property } = _decorator;
