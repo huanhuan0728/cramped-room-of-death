@@ -9,6 +9,13 @@ export interface IEntity{
   direction: DIRECTION_ENUM;
 }
 
+export interface ISpikes{
+  x:number;
+  y:number;
+  type:ENTITY_TYPE_ENUM;
+  count:number;
+}
+
 import { DIRECTION_ENUM, ENTITY_STATE_ENUM, ENTITY_TYPE_ENUM, TILE_TYPE_ENUM } from "../Enums";
 
 export interface ITile{

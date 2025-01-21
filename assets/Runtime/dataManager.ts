@@ -1,3 +1,4 @@
+import { sp } from "cc";
 import { EnemyManager } from "../Base/EnemyManager";
 import Singleton from "../Base/singleton";
 import { ITile } from "../Levels";
@@ -6,6 +7,7 @@ import { DoorManager } from "../Scripts/Door/DoorManager";
 import { PlayerManager } from "../Scripts/Player/PlayerManager";
 import { TileManager } from "../Scripts/Tile/TileManager";
 import { WoodenSkeletonManager } from "../Scripts/WoodenSkeleton/WoodenSkeletonManager";
+import { SpikesManager } from "../Scripts/Spikes/SpikesManager";
 export class DataManager extends Singleton{
 
   static get Instance(){
@@ -22,6 +24,7 @@ export class DataManager extends Singleton{
   door:DoorManager
   enemies:EnemyManager[]
   burst:BurstManager[]
+  spikes:SpikesManager[]
 
 
   reset(){
