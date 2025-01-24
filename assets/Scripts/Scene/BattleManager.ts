@@ -12,6 +12,8 @@ import { DoorManager } from '../Door/DoorManager';
 import { IronSkeletonManager } from '../IronSkeleton/IronSkeletonManager';
 import { BurstManager } from '../Burst/BurstManager';
 import { SpikesManager } from '../Spikes/SpikesManager';
+import State from '../../Base/State';
+import { SmokeManager } from '../Smoke/SmokeManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('BattleManager')
@@ -20,7 +22,11 @@ export class BattleManager extends Component {
     stage: Node;
 
     protected onLoad(): void {
-        EventManager.Instance.on(EVENT_ENUM.NEXT_LEVEL, this.nextLevel, this)
+        DataManager.Instance.levelIndex = 1;
+        EventManager.Instance.on(EVENT_ENUM.NEXT_LEVEL, this.nextLevel, this);
+        EventManager.Instance.on(EVENT_ENUM.PLAYER_MOVE_END, this.checkArrived, this);
+        EventManager.Instance.on(EVENT_ENUM.SHOW_SOMKE, this.generateSomke, this);
+
     }
 
     protected onDestroy(): void {
@@ -46,8 +52,8 @@ export class BattleManager extends Component {
 
             this.generateTileMap();
             this.generateDoor();
-            this.generateBursts();
-            this.generateSpikes();
+            // this.generateBursts();
+            // this.generateSpikes();
             this.generateEnemies();
             this.generatePlayer();
 
@@ -89,85 +95,77 @@ export class BattleManager extends Component {
         const player = createUINode();
         player.setParent(this.stage);
         const playerManager = player.addComponent(PlayerManager);
-        await playerManager.init({
-            x:2,
-            y:8,
-            type:ENTITY_TYPE_ENUM.PLAYER,
-            direction:DIRECTION_ENUM.TOP,
-            state: ENTITY_STATE_ENUM.IDLE
-          });
+        await playerManager.init(this.level.player);
         DataManager.Instance.player = playerManager;
         EventManager.Instance.emit(EVENT_ENUM.PLAYER_BORN, true)
     }
 
     async generateEnemies(){
+        const promise = [];
+        for(let i = 0; i < this.level.enemies.length; i++){
+            const enemy = this.level.enemies[i];
+            const node = createUINode();
+            node.setParent(this.stage);
+            const Manager =  enemy.type === ENTITY_TYPE_ENUM.SKELETON_WOODEN ? WoodenSkeletonManager:IronSkeletonManager
+            const manager = node.addComponent(Manager);
+            promise.push(manager.init(enemy));  // push进promise数组
+            DataManager.Instance.enemies.push(manager); // 推入数据中心
+        }
 
-        const enemy1 = createUINode();
-        enemy1.setParent(this.stage);
-        const woodenSkeletonManager = enemy1.addComponent(WoodenSkeletonManager);
-        await woodenSkeletonManager.init({
-            x:2,
-            y:4,
-            type:ENTITY_TYPE_ENUM.SKELETON_WOODEN,
-            direction:DIRECTION_ENUM.TOP,
-            state: ENTITY_STATE_ENUM.IDLE
-          });
-        DataManager.Instance.enemies.push(woodenSkeletonManager);
-
-        const enemy2 = createUINode();
-        enemy2.setParent(this.stage);
-        const ironSkeletonManager = enemy2.addComponent(IronSkeletonManager);
-        await ironSkeletonManager.init({
-            x:2,
-            y:2,
-            type:ENTITY_TYPE_ENUM.SKELETON_WOODEN,
-            direction:DIRECTION_ENUM.TOP,
-            state: ENTITY_STATE_ENUM.IDLE
-          });
-        DataManager.Instance.enemies.push(ironSkeletonManager);
+        await Promise.all(promise);
     }
 
     async generateDoor(){
         const door = createUINode();
         door.setParent(this.stage);
         const doorManager = door.addComponent(DoorManager);
-        await doorManager.init({
-            x:7,
-            y:8,
-            type:ENTITY_TYPE_ENUM.DOOR,
-            direction:DIRECTION_ENUM.TOP,
-            state: ENTITY_STATE_ENUM.IDLE
-          });
+        await doorManager.init(this.level.door);
         DataManager.Instance.door = doorManager;
     }
 
     async generateBursts(){
-        console.log("generateBurst")
-        const burst = createUINode();
-        burst.setParent(this.stage);
-        const burstManager = burst.addComponent(BurstManager);
-        await burstManager.init({
-            x:2,
-            y:6,
-            type:ENTITY_TYPE_ENUM.BURST,
-            direction:DIRECTION_ENUM.TOP,
-            state: ENTITY_STATE_ENUM.IDLE
-          });
-        DataManager.Instance.burst.push(burstManager)
+        const promise = [];
+        for(let i = 0; i < this.level.bursts.length; i++){
+            const burst = this.level.enemies[i];
+            const node = createUINode();
+            node.setParent(this.stage);
+            const Manager =  burst.type === ENTITY_TYPE_ENUM.SKELETON_WOODEN ? WoodenSkeletonManager:IronSkeletonManager
+            const manager = node.addComponent(Manager);
+            promise.push(manager.init(burst));  // push进promise数组
+            DataManager.Instance.enemies.push(manager); // 推入数据中心
+        }
+
+        await Promise.all(promise);
     }
 
     async generateSpikes(){
-        console.log("generateSpikes")
-        const spikes = createUINode();
-        spikes.setParent(this.stage);
-        const spikesManager = spikes.addComponent(SpikesManager);
-        await spikesManager.init({
-            x:2,
-            y:6,
-            type:ENTITY_TYPE_ENUM.SPIKES_ONE,
-            count: 0
-          });
-        DataManager.Instance.spikes.push(spikesManager)
+        const promise = [];
+        for(let i = 0; i < this.level.spikes.length; i++){
+            const spikes = this.level.enemies[i];
+            const node = createUINode();
+            node.setParent(this.stage);
+            const Manager =  spikes.type === ENTITY_TYPE_ENUM.SKELETON_WOODEN ? WoodenSkeletonManager:IronSkeletonManager
+            const manager = node.addComponent(Manager);
+            promise.push(manager.init(spikes));  // push进promise数组
+            DataManager.Instance.enemies.push(manager); // 推入数据中心
+        }
+
+        await Promise.all(promise);
+    }
+
+    async generateSomke(x:number, y:number, type:DIRECTION_ENUM){
+        const somke = createUINode();
+        somke.setParent(this.stage);
+        const somkeManager = somke.addComponent(SmokeManager);
+        await somkeManager.init({
+            x,
+            y,
+            direction: type,
+            state: ENTITY_STATE_ENUM.IDLE,
+            type: ENTITY_TYPE_ENUM.SMOKE,
+        });
+
+        DataManager.Instance.smoke.push(somkeManager);
     }
 
     adaptPos(){
@@ -176,6 +174,14 @@ export class BattleManager extends Component {
         const disY = TILE_HIGHT * mapColumnCount / 2 + 80;
 
         this.stage.setPosition(-disX, disY);
+    }
+
+    checkArrived(){
+        const {x:playerX, y:playerY} = DataManager.Instance.player;
+        const {x:doorX, y:doorY, state:doorState} = DataManager.Instance.door;
+        if(playerX === doorX && playerY === doorY && doorState === ENTITY_STATE_ENUM.DEATH){
+            EventManager.Instance.emit(EVENT_ENUM.NEXT_LEVEL)
+        }
     }
 
 

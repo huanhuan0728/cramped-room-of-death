@@ -1,5 +1,5 @@
 import { _decorator, Component, Node, Sprite, UITransform, Animation, AnimationClip, animation, Vec3, resources, SpriteFrame} from 'cc';
-import { CONTROLLER_ENUM, DIRECTION_ENUM, DIRECTION_ORDER_ENUM, ENTITY_STATE_ENUM, ENTITY_TYPE_ENUM, EVENT_ENUM, PARAMS_NAME_ENUM, SPIKE_TYPE_ENUM_TOTAL_COUNT } from 'db://assets/Enums';
+import { CONTROLLER_ENUM, DIRECTION_ENUM, DIRECTION_ORDER_ENUM, ENTITY_STATE_ENUM, ENTITY_TYPE_ENUM, EVENT_ENUM, PARAMS_NAME_ENUM, SPIKE_TYPE_MAP_ENUM_TOTAL_COUNT_ENUM } from 'db://assets/Enums';
 import { randomByLength } from '../../Utils';
 import { StateMachine } from '../../Base/StateMachine';
 import { ISpikes } from '../../Levels';
@@ -54,7 +54,7 @@ export class SpikesManager extends Component {
     this.x = params.x;
     this.y = params.y;
     this.type = params.type;
-    this.totalCount = SPIKE_TYPE_ENUM_TOTAL_COUNT[this.type];
+    this.totalCount = SPIKE_TYPE_MAP_ENUM_TOTAL_COUNT_ENUM[this.type];
     this.count = params.count;
   }
 

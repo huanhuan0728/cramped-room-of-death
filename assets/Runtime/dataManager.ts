@@ -8,6 +8,7 @@ import { PlayerManager } from "../Scripts/Player/PlayerManager";
 import { TileManager } from "../Scripts/Tile/TileManager";
 import { WoodenSkeletonManager } from "../Scripts/WoodenSkeleton/WoodenSkeletonManager";
 import { SpikesManager } from "../Scripts/Spikes/SpikesManager";
+import { SmokeManager } from "../Scripts/Smoke/SmokeManager";
 export class DataManager extends Singleton{
 
   static get Instance(){
@@ -25,6 +26,7 @@ export class DataManager extends Singleton{
   enemies:EnemyManager[]
   burst:BurstManager[]
   spikes:SpikesManager[]
+  smoke:SmokeManager[]
 
 
   reset(){
@@ -32,6 +34,8 @@ export class DataManager extends Singleton{
     this.tileInfo = [];
     this.enemies = [];
     this.burst = [];
+    this.spikes = [];
+    this.smoke = [];
     this.door = null;
     this.mapRowCount = 0;
     this.mapColumnCount = 0;

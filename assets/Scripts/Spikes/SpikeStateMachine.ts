@@ -1,10 +1,10 @@
 import { _decorator, Component, Node, Event, AnimationClip, Animation, SpriteFrame} from 'cc';
-import { EventManager } from '../../Runtime/EventManager';
-import { CONTROLLER_ENUM, ENTITY_STATE_ENUM, ENTITY_TYPE_ENUM, EVENT_ENUM, FSM_PARAMS_TYPE_ENUM, PARAMS_NAME_ENUM, SPIKE_TYPE_MAP_ENUM_TOTAL_COUNT } from '../../Enums';
-import State from '../../Base/State';
+import { CONTROLLER_ENUM, ENTITY_STATE_ENUM, ENTITY_TYPE_ENUM, EVENT_ENUM, FSM_PARAMS_TYPE_ENUM, PARAMS_NAME_ENUM, SPIKE_TYPE_MAP_ENUM_TOTAL_COUNT_ENUM } from '../../Enums';
 import { getInitParamsNumber, getInitParamsTrigger, StateMachine } from '../../Base/StateMachine';
-import { EnityManager } from '../../Base/EnityManager';
-import SpikesOneStateMachine from './SpikesOneStateMachine';
+import SpikesOneSubStateMachine from './SpikesOneSubStateMachine';
+import SpikesTwoStateMachine from './SpikesTwoStateMachine';
+import SpikesThreeStateMachine from './SpikesThreeSubStateMachine';
+import SpikesFourSubStateMachine from './SpikesFourSubStateMachine';
 
 
 const { ccclass, property } = _decorator;
@@ -31,7 +31,10 @@ export class SpikeStateMachine extends StateMachine {
   }
 
   initStateMachine(){
-    this.stateMachines.set(ENTITY_TYPE_ENUM.SPIKES_ONE, new SpikesOneStateMachine(this));
+    this.stateMachines.set(ENTITY_TYPE_ENUM.SPIKES_ONE, new SpikesOneSubStateMachine(this));
+    this.stateMachines.set(ENTITY_TYPE_ENUM.SPIKES_TWO, new SpikesTwoStateMachine(this));
+    this.stateMachines.set(ENTITY_TYPE_ENUM.SPIKES_THREE, new SpikesThreeStateMachine(this));
+    this.stateMachines.set(ENTITY_TYPE_ENUM.SPIKES_FOUR, new SpikesFourSubStateMachine(this));
   }
 
   initAnimationEvent(){
@@ -48,8 +51,17 @@ export class SpikeStateMachine extends StateMachine {
     const value = this.getParams(PARAMS_NAME_ENUM.SPIKES_TOTAL_COUNT);
     switch(this.currentState){
       case this.stateMachines.get(ENTITY_TYPE_ENUM.SPIKES_ONE):
-        if(value === SPIKE_TYPE_MAP_ENUM_TOTAL_COUNT.SPIKES_ONE){
+      case this.stateMachines.get(ENTITY_TYPE_ENUM.SPIKES_TWO):
+      case this.stateMachines.get(ENTITY_TYPE_ENUM.SPIKES_THREE):
+      case this.stateMachines.get(ENTITY_TYPE_ENUM.SPIKES_FOUR):
+        if(value === SPIKE_TYPE_MAP_ENUM_TOTAL_COUNT_ENUM.SPIKES_ONE){
           this.currentState = this.stateMachines.get(ENTITY_TYPE_ENUM.SPIKES_ONE);
+        }else if(value === SPIKE_TYPE_MAP_ENUM_TOTAL_COUNT_ENUM.SPIKES_TWO){
+          this.currentState = this.stateMachines.get(ENTITY_TYPE_ENUM.SPIKES_TWO);
+        }else if(value === SPIKE_TYPE_MAP_ENUM_TOTAL_COUNT_ENUM.SPIKES_THREE){
+          this.currentState = this.stateMachines.get(ENTITY_TYPE_ENUM.SPIKES_THREE);
+        }else if(value === SPIKE_TYPE_MAP_ENUM_TOTAL_COUNT_ENUM.SPIKES_FOUR){
+          this.currentState = this.stateMachines.get(ENTITY_TYPE_ENUM.SPIKES_FOUR);
         }else{
           this.currentState = this.currentState;
         }

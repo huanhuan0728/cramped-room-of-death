@@ -3,10 +3,11 @@ import { StateMachine } from "../../Base/StateMachine";
 import { DIRECTION_ENUM, DIRECTION_ORDER_ENUM, PARAMS_NAME_ENUM, SPIKE_COUNT_ENUM, SPIKE_COUNT_MAP_NUMBER_ENUM } from "../../Enums";
 import State from "../../Base/State";
 import DirectionSubStateMachine from "../../Base/DirectionSubStateMachine";
+import SpikesSubStateMachine from "./SpikesSubStateMachine";
 
-const BASE_URL = 'texture/spikes/spikesone'
+const BASE_URL = 'texture/spikes/spikesfour'
 
-export default class SpikesOneStateMachine extends DirectionSubStateMachine{
+export default class SpikesFourStateMachine extends SpikesSubStateMachine{
   constructor(fsm: StateMachine){
     super(fsm)
     this.stateMachines.set(
@@ -20,11 +21,21 @@ export default class SpikesOneStateMachine extends DirectionSubStateMachine{
     this.stateMachines.set(
       SPIKE_COUNT_ENUM.TWO,
       new State(fsm, `${BASE_URL}/two`))
+
+
+    this.stateMachines.set(
+      SPIKE_COUNT_ENUM.THREE,
+      new State(fsm, `${BASE_URL}/three`))
+
+
+    this.stateMachines.set(
+      SPIKE_COUNT_ENUM.FOUR,
+      new State(fsm, `${BASE_URL}/four`))
+
+
+    this.stateMachines.set(
+      SPIKE_COUNT_ENUM.FIVE,
+      new State(fsm, `${BASE_URL}/five`))
   }
 
-  run(): void {
-    const value = this.fsm.getParams(PARAMS_NAME_ENUM.SPIKES_CUR_COUNT);
-    this.currentState = this.stateMachines.get(SPIKE_COUNT_MAP_NUMBER_ENUM[value as number]);
-
-  }
 }
