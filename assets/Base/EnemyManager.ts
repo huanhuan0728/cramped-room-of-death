@@ -14,6 +14,7 @@ export class EnemyManager extends EnityManager {
   async init(params: IEntity){
 
     super.init(params)
+    console.log('注册PLAYER_BORN、PLAYER_MOVE_END、ATTACK_ENEMY事件');
     EventManager.Instance.on(EVENT_ENUM.PLAYER_BORN, this.onChangeDirection, this);
     EventManager.Instance.on(EVENT_ENUM.PLAYER_MOVE_END, this.onChangeDirection, this);
     EventManager.Instance.on(EVENT_ENUM.ATTACK_ENEMY, this.onDead, this)

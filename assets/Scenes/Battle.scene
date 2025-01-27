@@ -419,8 +419,8 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 295.5859375,
-      "height": 50.4
+      "width": 295.4722832443618,
+      "height": 50.400000000000006
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -452,7 +452,7 @@
     "_string": "Cramped Room of Death Demo",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 20,
+    "_actualFontSize": 21.708333333333336,
     "_fontSize": 20,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -506,7 +506,7 @@
     "_left": 0,
     "_right": 0,
     "_top": 0,
-    "_bottom": 15,
+    "_bottom": 14.999999999999996,
     "_horizontalCenter": 0,
     "_verticalCenter": 0,
     "_isAbsLeft": true,

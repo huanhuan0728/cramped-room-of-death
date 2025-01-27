@@ -1,209 +1,250 @@
-import { _decorator, Component, Node, Sprite, UITransform, Animation, AnimationClip, animation, Vec3, resources, SpriteFrame, Burst} from 'cc';
-import { EventManager } from '../../Runtime/EventManager';
-import { CONTROLLER_ENUM, DIRECTION_ENUM, DIRECTION_ORDER_ENUM, ENTITY_STATE_ENUM, ENTITY_TYPE_ENUM, EVENT_ENUM, PARAMS_NAME_ENUM } from '../../Enums';
-import { TILE_HIGHT, TILE_WIDTH } from '../Tile/TileManager';
-import { PlayerStateMachine } from './PlayerStateMachine';
-import { EnityManager } from '../../Base/EnityManager';
-import { DataManager } from '../../Runtime/dataManager';
-import { IEntity } from '../../Levels';
-import { EnemyManager } from '../../Base/EnemyManager';
-import { BurstManager } from '../Burst/BurstManager';
-const { ccclass, property } = _decorator;
-
+import {
+  _decorator,
+  Component,
+  Node,
+  Sprite,
+  UITransform,
+  Animation,
+  AnimationClip,
+  animation,
+  Vec3,
+  resources,
+  SpriteFrame,
+  Burst,
+} from 'cc'
+import { EventManager } from '../../Runtime/EventManager'
+import {
+  CONTROLLER_ENUM,
+  DIRECTION_ENUM,
+  DIRECTION_ORDER_ENUM,
+  ENTITY_STATE_ENUM,
+  ENTITY_TYPE_ENUM,
+  EVENT_ENUM,
+  PARAMS_NAME_ENUM,
+  SHAKE_TYPE_ENUM,
+} from '../../Enums'
+import { TILE_HIGHT, TILE_WIDTH } from '../Tile/TileManager'
+import { PlayerStateMachine } from './PlayerStateMachine'
+import { EnityManager } from '../../Base/EnityManager'
+import { DataManager } from '../../Runtime/dataManager'
+import { IEntity } from '../../Levels'
+import { EnemyManager } from '../../Base/EnemyManager'
+import { BurstManager } from '../Burst/BurstManager'
+const { ccclass, property } = _decorator
 
 @ccclass('PlayerManager')
 export class PlayerManager extends EnityManager {
-  targetX:number = 0;
-  targetY:number = 0;
-  isMoving = false;
-  private readonly speed = 1/10;
+  targetX: number = 0
+  targetY: number = 0
+  isMoving = false
+  private readonly speed = 1 / 10
 
-  async init(params:IEntity){
-
-    this.fsm = this.addComponent(PlayerStateMachine);
-    await this.fsm.init();
+  async init(params: IEntity) {
+    this.fsm = this.addComponent(PlayerStateMachine)
+    await this.fsm.init()
     super.init(params)
 
-    this.targetX = this.x;
-    this.targetY = this.y;
+    this.targetX = this.x
+    this.targetY = this.y
 
-
-    EventManager.Instance.on(EVENT_ENUM.PLAYER_CTRL, this.inputHandle, this);
-    EventManager.Instance.on(EVENT_ENUM.ATTACK_PLAYER, this.onDead, this);
-
-
+    EventManager.Instance.on(EVENT_ENUM.PLAYER_CTRL, this.inputHandle, this)
+    EventManager.Instance.on(EVENT_ENUM.ATTACK_PLAYER, this.onDead, this)
   }
 
-  onDestroy(){
-    super.onDestroy();
-    EventManager.Instance.off(EVENT_ENUM.PLAYER_CTRL, this.inputHandle);
-    EventManager.Instance.off(EVENT_ENUM.ATTACK_PLAYER, this.onDead);
+  onDestroy() {
+    super.onDestroy()
+    EventManager.Instance.off(EVENT_ENUM.PLAYER_CTRL, this.inputHandle)
+    EventManager.Instance.off(EVENT_ENUM.ATTACK_PLAYER, this.onDead)
   }
 
- update() {
-    this.updateXY();
-    super.update();
+  update() {
+    this.updateXY()
+    super.update()
   }
 
-  updateXY(){
-    if(this.targetX < this.x){
-      this.x -= this.speed;
-    }else if(this.targetX > this.x){
-      this.x += this.speed;
+  updateXY() {
+    if (this.targetX < this.x) {
+      this.x -= this.speed
+    } else if (this.targetX > this.x) {
+      this.x += this.speed
     }
-    if(this.targetY < this.y){
-      this.y -= this.speed;
-    }else if(this.targetY > this.y){
-      this.y += this.speed;
+    if (this.targetY < this.y) {
+      this.y -= this.speed
+    } else if (this.targetY > this.y) {
+      this.y += this.speed
     }
 
-    if(Math.abs(this.targetX - this.x) <= 0.1 && Math.abs(this.targetY - this.y) <= 0.1 && this.isMoving){
-      this.isMoving = false;
-      this.x = this.targetX;
-      this.y = this.targetY;
-      EventManager.Instance.emit(EVENT_ENUM.PLAYER_MOVE_END);
-
+    if (Math.abs(this.targetX - this.x) <= 0.1 && Math.abs(this.targetY - this.y) <= 0.1 && this.isMoving) {
+      this.isMoving = false
+      this.x = this.targetX
+      this.y = this.targetY
+      EventManager.Instance.emit(EVENT_ENUM.PLAYER_MOVE_END)
     }
-
-
   }
 
-  onDead(type:ENTITY_STATE_ENUM){
+  onDead(type: ENTITY_STATE_ENUM) {
     this.state = type
   }
 
-  willAttack(type:CONTROLLER_ENUM){
+  willAttack(type: CONTROLLER_ENUM) {
     const enemies = DataManager.Instance.enemies.filter(enemy => enemy.state !== ENTITY_STATE_ENUM.DEATH)
-    for(let i = 0; i < enemies.length; i++){
-      const {x:enemyX, y:enemyY, id: enemyId } = enemies[i];
-      if(type === CONTROLLER_ENUM.TOP &&
-         this.direction === DIRECTION_ENUM.TOP &&
-         enemyX === this.x &&
-         enemyY === this.targetY - 2){
-          this.state = ENTITY_STATE_ENUM.ATTACK
-          return enemyId
-      }else if(type === CONTROLLER_ENUM.BOTTOM &&
+    for (let i = 0; i < enemies.length; i++) {
+      const { x: enemyX, y: enemyY, id: enemyId } = enemies[i]
+      if (
+        type === CONTROLLER_ENUM.TOP &&
+        this.direction === DIRECTION_ENUM.TOP &&
+        enemyX === this.x &&
+        enemyY === this.targetY - 2
+      ) {
+        this.state = ENTITY_STATE_ENUM.ATTACK
+        return enemyId
+      } else if (
+        type === CONTROLLER_ENUM.BOTTOM &&
         this.direction === DIRECTION_ENUM.BOTTOM &&
         enemyX === this.x &&
-        enemyY === this.targetY + 2){
-          this.state = ENTITY_STATE_ENUM.ATTACK
-          return enemyId
-      }else if(type === CONTROLLER_ENUM.LEFT &&
+        enemyY === this.targetY + 2
+      ) {
+        this.state = ENTITY_STATE_ENUM.ATTACK
+        return enemyId
+      } else if (
+        type === CONTROLLER_ENUM.LEFT &&
         this.direction === DIRECTION_ENUM.LEFT &&
         enemyX === this.x - 2 &&
-        enemyY === this.targetY){
-          this.state = ENTITY_STATE_ENUM.ATTACK
-          return enemyId
-      }else if(type === CONTROLLER_ENUM.RIGHT &&
+        enemyY === this.targetY
+      ) {
+        this.state = ENTITY_STATE_ENUM.ATTACK
+        return enemyId
+      } else if (
+        type === CONTROLLER_ENUM.RIGHT &&
         this.direction === DIRECTION_ENUM.RIGHT &&
         enemyX === this.x + 2 &&
-        enemyY === this.targetY){
-          this.state = ENTITY_STATE_ENUM.ATTACK
-          return enemyId
+        enemyY === this.targetY
+      ) {
+        this.state = ENTITY_STATE_ENUM.ATTACK
+        return enemyId
       }
     }
 
     return ''
   }
 
-  inputHandle(inputDirection:CONTROLLER_ENUM){
-    if(this.isMoving){
+  inputHandle(inputDirection: CONTROLLER_ENUM) {
+    if (this.isMoving) {
       return
     }
-    if(this.state === ENTITY_STATE_ENUM.DEATH || this.state === ENTITY_STATE_ENUM.AIRDEATH || this.state === ENTITY_STATE_ENUM.ATTACK){
+    if (
+      this.state === ENTITY_STATE_ENUM.DEATH ||
+      this.state === ENTITY_STATE_ENUM.AIRDEATH ||
+      this.state === ENTITY_STATE_ENUM.ATTACK
+    ) {
       return
     }
 
     const id = this.willAttack(inputDirection)
-    if(id){
+    if (id) {
       EventManager.Instance.emit(EVENT_ENUM.ATTACK_ENEMY, id)
       EventManager.Instance.emit(EVENT_ENUM.DOOR_OPEN)
-      return;
+      return
     }
 
-    if(this.willBlock(inputDirection)){
-      console.log("block");
-      return;
+    if (this.willBlock(inputDirection)) {
+      if (inputDirection === CONTROLLER_ENUM.TOP) {
+        EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE, SHAKE_TYPE_ENUM.TOP)
+      } else if (inputDirection === CONTROLLER_ENUM.BOTTOM) {
+        EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE, SHAKE_TYPE_ENUM.BOTTOM)
+      } else if (inputDirection === CONTROLLER_ENUM.LEFT) {
+        EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE, SHAKE_TYPE_ENUM.LEFT)
+      } else if (inputDirection === CONTROLLER_ENUM.RIGHT) {
+        EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE, SHAKE_TYPE_ENUM.RIGHT)
+      } else if (inputDirection === CONTROLLER_ENUM.TURNLEFT) {
+        if (this.direction === DIRECTION_ENUM.TOP) {
+          EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE, SHAKE_TYPE_ENUM.LEFT)
+        } else if (this.direction === DIRECTION_ENUM.LEFT) {
+          EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE, SHAKE_TYPE_ENUM.BOTTOM)
+        } else if (this.direction === DIRECTION_ENUM.BOTTOM) {
+          EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE, SHAKE_TYPE_ENUM.RIGHT)
+        } else if (this.direction === DIRECTION_ENUM.RIGHT) {
+          EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE, SHAKE_TYPE_ENUM.TOP)
+        }
+      } else if (inputDirection === CONTROLLER_ENUM.TURNRIGHT) {
+        if (this.direction === DIRECTION_ENUM.TOP) {
+          EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE, SHAKE_TYPE_ENUM.RIGHT)
+        } else if (this.direction === DIRECTION_ENUM.LEFT) {
+          EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE, SHAKE_TYPE_ENUM.TOP)
+        } else if (this.direction === DIRECTION_ENUM.BOTTOM) {
+          EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE, SHAKE_TYPE_ENUM.LEFT)
+        } else if (this.direction === DIRECTION_ENUM.RIGHT) {
+          EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE, SHAKE_TYPE_ENUM.BOTTOM)
+        }
+      }
+
+      return
     }
 
     this.move(inputDirection)
-
   }
 
-
-  move(inputDirection:CONTROLLER_ENUM){
-    if(inputDirection === CONTROLLER_ENUM.TOP){
-      this.targetY -= 1;
-      this.isMoving = true;
-      this.showSmoke(DIRECTION_ENUM.TOP);
-
-    }else if(inputDirection === CONTROLLER_ENUM.BOTTOM){
-      this.targetY += 1;
-      this.isMoving = true;
-      this.showSmoke(DIRECTION_ENUM.BOTTOM);
-
-
-    }else if(inputDirection === CONTROLLER_ENUM.LEFT){
-      this.isMoving = true;
-      this.targetX -= 1;
-      this.showSmoke(DIRECTION_ENUM.LEFT);
-
-
-    }else if(inputDirection === CONTROLLER_ENUM.RIGHT){
-      this.isMoving = true;
-      this.targetX += 1;
-      this.showSmoke(DIRECTION_ENUM.RIGHT);
-
-
-    }else if(inputDirection === CONTROLLER_ENUM.TURNLEFT){
-      if(this.direction === DIRECTION_ENUM.TOP){
+  move(inputDirection: CONTROLLER_ENUM) {
+    if (inputDirection === CONTROLLER_ENUM.TOP) {
+      this.targetY -= 1
+      this.isMoving = true
+      this.showSmoke(DIRECTION_ENUM.TOP)
+      console.log('top')
+    } else if (inputDirection === CONTROLLER_ENUM.BOTTOM) {
+      this.targetY += 1
+      this.isMoving = true
+      this.showSmoke(DIRECTION_ENUM.BOTTOM)
+      console.log('bottom')
+    } else if (inputDirection === CONTROLLER_ENUM.LEFT) {
+      this.isMoving = true
+      this.targetX -= 1
+      this.showSmoke(DIRECTION_ENUM.LEFT)
+      console.log('left')
+    } else if (inputDirection === CONTROLLER_ENUM.RIGHT) {
+      this.isMoving = true
+      this.targetX += 1
+      this.showSmoke(DIRECTION_ENUM.RIGHT)
+      console.log('right')
+    } else if (inputDirection === CONTROLLER_ENUM.TURNLEFT) {
+      if (this.direction === DIRECTION_ENUM.TOP) {
         this.direction = DIRECTION_ENUM.LEFT
-      }else if(this.direction === DIRECTION_ENUM.LEFT){
-        this.direction = DIRECTION_ENUM.BOTTOM;
-      }else if(this.direction === DIRECTION_ENUM.BOTTOM){
-        this.direction = DIRECTION_ENUM.RIGHT;
-      }else if(this.direction === DIRECTION_ENUM.RIGHT){
-        this.direction = DIRECTION_ENUM.TOP;
-      }
-      this.state = ENTITY_STATE_ENUM.TURNLEFT;
-      EventManager.Instance.emit(EVENT_ENUM.PLAYER_MOVE_END);
-
-    }else if(inputDirection === CONTROLLER_ENUM.TURNRIGHT){
-      if(this.direction === DIRECTION_ENUM.TOP){
+      } else if (this.direction === DIRECTION_ENUM.LEFT) {
+        this.direction = DIRECTION_ENUM.BOTTOM
+      } else if (this.direction === DIRECTION_ENUM.BOTTOM) {
         this.direction = DIRECTION_ENUM.RIGHT
-      }else if(this.direction === DIRECTION_ENUM.LEFT){
-        this.direction = DIRECTION_ENUM.TOP;
-      }else if(this.direction === DIRECTION_ENUM.BOTTOM){
-        this.direction = DIRECTION_ENUM.LEFT;
-      }else if(this.direction === DIRECTION_ENUM.RIGHT){
-        this.direction = DIRECTION_ENUM.BOTTOM;
+      } else if (this.direction === DIRECTION_ENUM.RIGHT) {
+        this.direction = DIRECTION_ENUM.TOP
       }
-      this.state = ENTITY_STATE_ENUM.TURNRIGHT;
-      EventManager.Instance.emit(EVENT_ENUM.PLAYER_MOVE_END);
+      this.state = ENTITY_STATE_ENUM.TURNLEFT
+      EventManager.Instance.emit(EVENT_ENUM.PLAYER_MOVE_END)
+    } else if (inputDirection === CONTROLLER_ENUM.TURNRIGHT) {
+      if (this.direction === DIRECTION_ENUM.TOP) {
+        this.direction = DIRECTION_ENUM.RIGHT
+      } else if (this.direction === DIRECTION_ENUM.LEFT) {
+        this.direction = DIRECTION_ENUM.TOP
+      } else if (this.direction === DIRECTION_ENUM.BOTTOM) {
+        this.direction = DIRECTION_ENUM.LEFT
+      } else if (this.direction === DIRECTION_ENUM.RIGHT) {
+        this.direction = DIRECTION_ENUM.BOTTOM
+      }
+      this.state = ENTITY_STATE_ENUM.TURNRIGHT
+      EventManager.Instance.emit(EVENT_ENUM.PLAYER_MOVE_END)
     }
   }
 
-  showSmoke(type:DIRECTION_ENUM){
-    EventManager.Instance.emit(EVENT_ENUM.SHOW_SOMKE, this.x, this.y, type);
-    console.log("show smoke");
+  showSmoke(type: DIRECTION_ENUM) {
+    EventManager.Instance.emit(EVENT_ENUM.SHOW_SOMKE, this.x, this.y, type)
+    console.log('show smoke')
   }
-
-
 
   willBlock(type: CONTROLLER_ENUM) {
     const { targetX: x, targetY: y, direction } = this
     const { tileInfo: tileInfo } = DataManager.Instance
-    // const enemies: EnemyManager[] = DataManager.Instance.enemies.filter(
-    //   (enemy: EnemyManager) => enemy.state !== ENTITY_STATE_ENUM.DEATH,
-    // )
-    // const { x: doorX, y: doorY, state: doorState } = DataManager.Instance.door || {}
-    // const bursts: BurstManager[] = DataManager.Instance.bursts.filter(
-    //   (burst: BurstManager) => burst.state !== ENTITY_STATE_ENUM.DEATH,
-    // )
-    const {x: doorX, y: doorY, state: doorState} = DataManager.Instance.door
-    const enemies:EnemyManager[] = DataManager.Instance.enemies.filter(enemy => enemy.state !== ENTITY_STATE_ENUM.DEATH)
-    const burst:BurstManager[] = DataManager.Instance.burst.filter(burst => burst.state !== ENTITY_STATE_ENUM.DEATH)
-
+    const { x: doorX, y: doorY, state: doorState } = DataManager.Instance.door
+    const enemies: EnemyManager[] = DataManager.Instance.enemies.filter(
+      enemy => enemy.state !== ENTITY_STATE_ENUM.DEATH,
+    )
+    const burst: BurstManager[] = DataManager.Instance.burst.filter(burst => burst.state !== ENTITY_STATE_ENUM.DEATH)
 
     const { mapRowCount: row, mapColumnCount: column } = DataManager.Instance
 
@@ -243,10 +284,10 @@ export class PlayerManager extends EnityManager {
           }
         }
 
-        for(let i = 0; i < burst.length; i++){
+        for (let i = 0; i < burst.length; i++) {
           const { x: burstX, y: burstY } = burst[i]
-          if((burstX === x && burstY === playerNextY) && ((!nextWeaponTile || nextWeaponTile.turnable))){
-            return false;
+          if (burstX === x && burstY === playerNextY && (!nextWeaponTile || nextWeaponTile.turnable)) {
+            return false
           }
         }
 
@@ -1144,5 +1185,7 @@ export class PlayerManager extends EnityManager {
     return false
   }
 
+  onAttackShake(type: SHAKE_TYPE_ENUM) {
+    EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE, type)
+  }
 }
-

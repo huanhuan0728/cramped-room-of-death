@@ -28,7 +28,6 @@
     "**/node_modules": true,
     "**/bower_components": true
   },
-  //
   "editor.rulers": [80, 120],
   "files.eol": "\n",
   "files.trimTrailingWhitespace": true,
@@ -57,7 +56,6 @@
   },
   "javascript.format.enable": false,
   "typescript.format.enable": false,
-  //
   "json.format.enable": true,
   "[json]": {
     "editor.tabSize": 2,
@@ -75,6 +73,10 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "editor.tabSize": 2,
   "svg.preview.background": "black",
-  // css modules 默认支持 camelCase
-  "cssModules.camelCase": true
+  "cssModules.camelCase": true,
+  "compile-hero.disable-compile-files-on-did-save-code": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "prettier.singleQuote": true,
+  "prettier.tabWidth": 2,
+  "prettier.trailingComma": "all"
 }
